@@ -15,13 +15,13 @@ THEMAS = {
     "Mensenhandel": ["mensenhandel", "loverboy", "seksuele uitbuiting", "criminele uitbuiting", "uitbuiting", "gedwongen prostitutie", "mensensmokkel", "arbeidsuitbuiting"],
     "PGA (Persoonsgerichte Aanpak)": ["persoonsgerichte aanpak", "pga", "veelpleger", "top600", "top400", "ISD", "zorg- en veiligheidshuis", "casusregie", "procesregie", "top1000", "brusjesaanpak", "HIC"],
     "Detentie & Terugkeer": ["detentie", "reclassering", "gevangeniswezen", "tbs", "re-integratie", "terugkeerbeleid", "na-zorg", "ex-gedetineerden", "forensische zorg", "wfz", "recidive", "bestuurlijk akkoord"],
-    "Suïcidepreventie": ["suïcide", "zelfdoding", "113", "zelfmoord", "suïcidaliteit"],
+    "Suïcidepreventie": ["suïcide", "zelfdoding", "zelfmoord", "suïcidaliteit"],
     "Verslaving": ["verslaving", "verslavingszorg", "drugs", "crack", "middelengebruik", "drugsbeleid", "dubbele diagnose", "overlast", "gebruikersruimte"],
     "Jeugdcriminaliteit": ["jeugdcriminaliteit", "jeugdbescherming", "jeugdreclassering", "criminele jeugdnetwerken", "ondermijning", "jonge aanwas", "preventie met gezag", "jeugdzorg"],
     "Seksueel Geweld & Femicide": ["seksueel geweld", "zeden", "zedendelict", "femicide", "vrouwenmoord", "huiselijk geweld", "partnergeweld", "intieme terreur", "eergerelateerd geweld"]
 }
 
-EXACTE_WOORDEN = ["pga", "isd", "hic", "113", "lvb", "wzd", "wvggz", "e33", "wfz"]
+EXACTE_WOORDEN = ["pga", "isd", "hic", "lvb", "wzd", "wvggz", "e33", "wfz"]
 
 def check_tekst_voor_themas(tekst):
     gevonden_themas = set()
