@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 # 1. JOUW THEMA'S & ZOEKWOORDEN
 # ==========================================
 THEMAS = {
-    "Onbegrepen gedrag": ["onbegrepen gedrag", "verwarde personen", "verward gedrag", "onbegrepen personen", "LVB", "licht verstandelijke beperking", "psychische kwetsbaarheid", "crisisdienst", "WVGGZ", "WZD", "E33", "bemoeizorg", "straattriage", "ggz"],
+    "Onbegrepen gedrag": ["onbegrepen gedrag", "verwarde personen", "verward gedrag", "onbegrepen personen", "LVB", "licht verstandelijke beperking", "psychische kwetsbaarheid", "crisisdienst", "WVGGZ", "WZD", "E33", "bemoeizorg", "straattriage"],
     "Dak- en thuisloosheid": ["dakloos", "thuisloos", "maatschappelijke opvang", "beschermd wonen", "nachtopvang", "skaeve huse", "housing first"],
     "Mensenhandel": ["mensenhandel", "loverboy", "seksuele uitbuiting", "criminele uitbuiting", "uitbuiting", "gedwongen prostitutie", "mensensmokkel", "arbeidsuitbuiting"],
     "PGA (Persoonsgerichte Aanpak)": ["persoonsgerichte aanpak", "pga", "veelpleger", "top600", "top400", "ISD", "zorg- en veiligheidshuis", "casusregie", "procesregie", "top1000", "brusjesaanpak", "HIC"],
@@ -46,16 +46,18 @@ def check_tekst_voor_themas(tekst):
 st.set_page_config(page_title="Z&V Monitor", page_icon="🏛️", layout="centered")
 
 st.title("🏛️ Politieke Monitor: Zorg & Veiligheid")
-st.write("Welkom! Klik op de knop hieronder om de geplande Tweede Kamerdebatten van de komende 30 dagen te scannen op onderwerpen rondom Zorg en Veiligheid.")
+st.write("Welkom! Klik op de knop hieronder om de geplande Tweede Kamerdebatten van het **komende halfjaar** te scannen op onderwerpen rondom Zorg en Veiligheid. Nieuwe toevoegingen van de afgelopen 2 weken worden groen gemarkeerd.")
 
 if st.button("Start de Scan & Genereer Excel", type="primary"):
-    with st.spinner('De Tweede Kamer agenda wordt nu uitgelezen en geanalyseerd. Dit duurt ongeveer 10 tot 20 seconden...'):
+    with st.spinner('De Tweede Kamer agenda wordt nu uitgelezen en geanalyseerd. Dit kan door de periode van een halfjaar zo\'n 20 tot 30 seconden duren...'):
         
         # Data Ophalen
         vandaag = datetime.now()
-        volgende_maand = vandaag + timedelta(days=30)
+        komend_halfjaar = vandaag + timedelta(days=183) # <-- 6 maanden vooruit
+        twee_weken_geleden = vandaag - timedelta(days=14) # <-- 14 dagen terugkijken
+        
         start_datum = vandaag.strftime("%Y-%m-%dT00:00:00Z")
-        eind_datum = volgende_maand.strftime("%Y-%m-%dT23:59:59Z")
+        eind_datum = komend_halfjaar.strftime("%Y-%m-%dT23:59:59Z")
         
         url = "https://gegevensmagazijn.tweedekamer.nl/OData/v4/2.0/Activiteit"
         alle_activiteiten = []
@@ -94,6 +96,20 @@ if st.button("Start de Scan & Genereer Excel", type="primary"):
             if not commissie:
                 commissie = "Plenair (Volledige Kamer)" if "plenair" in soort.lower() else "Niet gespecificeerd"
 
+            # ----------------------------------------------------
+            # NIEUW: Korter dan 14 dagen geleden gewijzigd/toegevoegd?
+            # ----------------------------------------------------
+            gewijzigd_op_str = act.get('GewijzigdOp', '')
+            is_recent = False
+            if gewijzigd_op_str:
+                try:
+                    datum_gewijzigd = datetime.strptime(gewijzigd_op_str[:10], "%Y-%m-%d")
+                    if datum_gewijzigd >= twee_weken_geleden:
+                        is_recent = True
+                except Exception:
+                    pass
+            # ----------------------------------------------------
+
             hoofd_tekst = f"{volledige_titel} {omschrijving}"
             match_themas, match_woorden = check_tekst_voor_themas(hoofd_tekst)
             
@@ -111,26 +127,28 @@ if st.button("Start de Scan & Genereer Excel", type="primary"):
                 raw_datum = act.get('Datum', '')
                 datum_str = raw_datum.split('T')[0] if 'T' in raw_datum else raw_datum
                 export_data.append({
-                    "Datum": datum_str, "Soort Activiteit": soort, "Commissie / Ministerie": commissie,
-                    "Thema's": ", ".join(list(match_themas)), "Titel": volledige_titel,
+                    "Nieuw/Gewijzigd (14 dgn)": "🟢 JA" if is_recent else "-",  # <-- Kolom 14 dagen!
+                    "Datum": datum_str, 
+                    "Soort Activiteit": soort, 
+                    "Commissie / Ministerie": commissie,
+                    "Thema's": ", ".join(list(match_themas)), 
+                    "Titel": volledige_titel,
                     "Gevonden Trefwoorden": ", ".join(list(match_woorden)),
                     "Relevante Agendapunten": "\n- ".join(relevante_agendapunten) if relevante_agendapunten else "(Titel is relevant)",
                     "Link naar Debat": link
                 })
 
     if not export_data:
-        st.warning("Er zijn geen relevante debatten gevonden in de komende 30 dagen.")
+        st.warning("Er zijn geen relevante debatten gevonden voor het komende halfjaar.")
     else:
         st.success(f"🎉 Klaar! Er zijn {len(export_data)} relevante debatten gevonden.")
         
-        # Excel genereren in het geheugen van de web-app
         df = pd.DataFrame(export_data)
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
             df.to_excel(writer, index=False, sheet_name='Debatten')
         excel_data = output.getvalue()
         
-        # Een grote downloadknop maken
         st.download_button(
             label="📥 Download Excel Overzicht",
             data=excel_data,
