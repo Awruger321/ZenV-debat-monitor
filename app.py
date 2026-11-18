@@ -15,13 +15,13 @@ THEMAS = {
     "Mensenhandel": ["mensenhandel", "loverboy", "seksuele uitbuiting", "criminele uitbuiting", "uitbuiting", "gedwongen prostitutie", "mensensmokkel", "arbeidsuitbuiting"],
     "PGA (Persoonsgerichte Aanpak)": ["persoonsgerichte aanpak", "pga", "veelpleger", "top600", "top400", "ISD", "zorg- en veiligheidshuis", "casusregie", "procesregie", "top1000", "brusjesaanpak", "HIC"],
     "Detentie & Terugkeer": ["detentie", "reclassering", "gevangeniswezen", "tbs", "re-integratie", "terugkeerbeleid", "na-zorg", "ex-gedetineerden", "forensische zorg", "wfz", "recidive", "bestuurlijk akkoord"],
-    "Suïcidepreventie": ["suïcide", "zelfdoding", "zelfmoord", "suïcidaliteit"],
+    "Suïcidepreventie": ["suïcide", "zelfdoding", "113", "zelfmoord", "suïcidaliteit"],
     "Verslaving": ["verslaving", "verslavingszorg", "drugs", "crack", "middelengebruik", "drugsbeleid", "dubbele diagnose", "overlast", "gebruikersruimte"],
     "Jeugdcriminaliteit": ["jeugdcriminaliteit", "jeugdbescherming", "jeugdreclassering", "criminele jeugdnetwerken", "ondermijning", "jonge aanwas", "preventie met gezag", "jeugdzorg"],
     "Seksueel Geweld & Femicide": ["seksueel geweld", "zeden", "zedendelict", "femicide", "vrouwenmoord", "huiselijk geweld", "partnergeweld", "intieme terreur", "eergerelateerd geweld"]
 }
 
-EXACTE_WOORDEN = ["pga", "isd", "hic", "lvb", "wzd", "wvggz", "e33", "wfz"]
+EXACTE_WOORDEN = ["pga", "isd", "hic", "113", "lvb", "wzd", "wvggz", "e33", "wfz"]
 
 def check_tekst_voor_themas(tekst):
     gevonden_themas = set()
@@ -43,22 +43,26 @@ def check_tekst_voor_themas(tekst):
 # ==========================================
 # 2. STREAMLIT INTERFACE
 # ==========================================
-st.set_page_config(page_title="Z&V Monitor", page_icon="🏛️", layout="centered")
+# layout="wide" zorgt voor meer ruimte voor de tabel
+st.set_page_config(page_title="Z&V Monitor", page_icon="🏛️", layout="wide")
 
 st.title("🏛️ Politieke Monitor: Zorg & Veiligheid")
-st.write("Welkom! Klik op de knop hieronder om de geplande Tweede Kamerdebatten van het **komende halfjaar** te scannen op onderwerpen rondom Zorg en Veiligheid. Nieuwe toevoegingen van de afgelopen 2 weken worden groen gemarkeerd.")
+st.write("Welkom! Hieronder vind je de geplande Tweede Kamerdebatten rondom Zorg & Veiligheid. Op het scherm zie je de planning voor de **komende 30 dagen**. Via de knop onderaan kun je het complete **halfjaar-overzicht** downloaden als Excel.")
 
-if st.button("Start de Scan & Genereer Excel", type="primary"):
-    with st.spinner('De Tweede Kamer agenda wordt nu uitgelezen en geanalyseerd. Dit kan door de periode van een halfjaar zo\'n 20 tot 30 seconden duren...'):
+if st.button("Start de Scan", type="primary"):
+    with st.spinner('De agenda van het komende halfjaar wordt uitgelezen en geanalyseerd...'):
         
-        # Data Ophalen
+        # Tijden instellen
         vandaag = datetime.now()
-        komend_halfjaar = vandaag + timedelta(days=183) # <-- 6 maanden vooruit
-        twee_weken_geleden = vandaag - timedelta(days=14) # <-- 14 dagen terugkijken
+        komend_halfjaar = vandaag + timedelta(days=183)
+        komende_30_dagen = vandaag + timedelta(days=30)
+        twee_weken_geleden = vandaag - timedelta(days=14)
         
         start_datum = vandaag.strftime("%Y-%m-%dT00:00:00Z")
         eind_datum = komend_halfjaar.strftime("%Y-%m-%dT23:59:59Z")
+        grens_30_dagen_str = komende_30_dagen.strftime("%Y-%m-%d")
         
+        # API Uitlezen
         url = "https://gegevensmagazijn.tweedekamer.nl/OData/v4/2.0/Activiteit"
         alle_activiteiten = []
         skip = 0
@@ -96,9 +100,6 @@ if st.button("Start de Scan & Genereer Excel", type="primary"):
             if not commissie:
                 commissie = "Plenair (Volledige Kamer)" if "plenair" in soort.lower() else "Niet gespecificeerd"
 
-            # ----------------------------------------------------
-            # NIEUW: Korter dan 14 dagen geleden gewijzigd/toegevoegd?
-            # ----------------------------------------------------
             gewijzigd_op_str = act.get('GewijzigdOp', '')
             is_recent = False
             if gewijzigd_op_str:
@@ -108,7 +109,6 @@ if st.button("Start de Scan & Genereer Excel", type="primary"):
                         is_recent = True
                 except Exception:
                     pass
-            # ----------------------------------------------------
 
             hoofd_tekst = f"{volledige_titel} {omschrijving}"
             match_themas, match_woorden = check_tekst_voor_themas(hoofd_tekst)
@@ -127,7 +127,7 @@ if st.button("Start de Scan & Genereer Excel", type="primary"):
                 raw_datum = act.get('Datum', '')
                 datum_str = raw_datum.split('T')[0] if 'T' in raw_datum else raw_datum
                 export_data.append({
-                    "Nieuw/Gewijzigd (14 dgn)": "🟢 JA" if is_recent else "-",  # <-- Kolom 14 dagen!
+                    "Nieuw/Gewijzigd (14 dgn)": "🟢 JA" if is_recent else "-",
                     "Datum": datum_str, 
                     "Soort Activiteit": soort, 
                     "Commissie / Ministerie": commissie,
@@ -141,16 +141,42 @@ if st.button("Start de Scan & Genereer Excel", type="primary"):
     if not export_data:
         st.warning("Er zijn geen relevante debatten gevonden voor het komende halfjaar.")
     else:
-        st.success(f"🎉 Klaar! Er zijn {len(export_data)} relevante debatten gevonden.")
+        # Maak het grote dataframe voor Excel
+        df_full = pd.DataFrame(export_data)
         
-        df = pd.DataFrame(export_data)
+        # Maak een kleiner dataframe aan specifiek voor op het scherm (max 30 dagen)
+        df_30_dagen = df_full[df_full['Datum'] <= grens_30_dagen_str]
+        
+        st.success(f"🎉 Klaar! Er zijn {len(df_full)} relevante debatten gevonden, waarvan {len(df_30_dagen)} in de komende maand.")
+        
+        st.write("---")
+        st.subheader("📅 Binnenkort op de agenda (komende 30 dagen)")
+        
+        if not df_30_dagen.empty:
+            # We tonen een schone selectie van kolommen op het scherm
+            st.dataframe(
+                df_30_dagen[["Datum", "Nieuw/Gewijzigd (14 dgn)", "Thema's", "Titel", "Commissie / Ministerie", "Link naar Debat"]],
+                column_config={
+                    "Link naar Debat": st.column_config.LinkColumn("Bekijk online") # Maakt een aanklikbare link in de tabel
+                },
+                use_container_width=True,
+                hide_index=True
+            )
+        else:
+            st.info("Er staan momenteel geen Z&V debatten gepland in de aankomende 30 dagen.")
+
+        st.write("---")
+        st.subheader("📊 Volledig overzicht downloaden (6 maanden)")
+        st.write(f"In de Excel vind je alle details, inclusief de specifieke agendapunten en de gevonden trefwoorden voor de volle {len(df_full)} debatten.")
+        
+        # Genereer het Excel bestand op basis van het VOLLEDIGE (df_full) dataframe
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            df.to_excel(writer, index=False, sheet_name='Debatten')
+            df_full.to_excel(writer, index=False, sheet_name='Debatten')
         excel_data = output.getvalue()
         
         st.download_button(
-            label="📥 Download Excel Overzicht",
+            label="📥 Download Compleet Excel Overzicht",
             data=excel_data,
             file_name=f"ZorgVeiligheid_Agenda_{datetime.now().strftime('%Y-%m-%d')}.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
