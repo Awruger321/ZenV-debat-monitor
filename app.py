@@ -43,11 +43,10 @@ def check_tekst_voor_themas(tekst):
 # ==========================================
 # 2. STREAMLIT INTERFACE
 # ==========================================
-# layout="wide" zorgt voor meer ruimte voor de tabel
 st.set_page_config(page_title="Z&V Monitor", page_icon="🏛️", layout="wide")
 
 st.title("🏛️ Politieke Monitor: Zorg & Veiligheid")
-st.write("Welkom! Hieronder vind je de geplande Tweede Kamerdebatten rondom Zorg & Veiligheid. Op het scherm zie je de planning voor de **komende 30 dagen**. Via de knop onderaan kun je het complete **halfjaar-overzicht** downloaden als Excel.")
+st.write("Welkom! Hieronder vind je de geplande Tweede Kamerdebatten rondom Zorg & Veiligheid. Op het scherm zie je de planning voor de **komende 30 dagen**. Nieuwe toevoegingen van de afgelopen **7 dagen** worden groen gemarkeerd. Via de knop onderaan kun je het complete **halfjaar-overzicht** downloaden als Excel.")
 
 if st.button("Start de Scan", type="primary"):
     with st.spinner('De agenda van het komende halfjaar wordt uitgelezen en geanalyseerd...'):
@@ -56,7 +55,7 @@ if st.button("Start de Scan", type="primary"):
         vandaag = datetime.now()
         komend_halfjaar = vandaag + timedelta(days=183)
         komende_30_dagen = vandaag + timedelta(days=30)
-        twee_weken_geleden = vandaag - timedelta(days=14)
+        zeven_dagen_geleden = vandaag - timedelta(days=7) # <-- Aangepast naar 7 dagen!
         
         start_datum = vandaag.strftime("%Y-%m-%dT00:00:00Z")
         eind_datum = komend_halfjaar.strftime("%Y-%m-%dT23:59:59Z")
@@ -105,7 +104,8 @@ if st.button("Start de Scan", type="primary"):
             if gewijzigd_op_str:
                 try:
                     datum_gewijzigd = datetime.strptime(gewijzigd_op_str[:10], "%Y-%m-%d")
-                    if datum_gewijzigd >= twee_weken_geleden:
+                    # Check of de wijziging in de afgelopen 7 dagen was
+                    if datum_gewijzigd >= zeven_dagen_geleden:
                         is_recent = True
                 except Exception:
                     pass
@@ -127,7 +127,7 @@ if st.button("Start de Scan", type="primary"):
                 raw_datum = act.get('Datum', '')
                 datum_str = raw_datum.split('T')[0] if 'T' in raw_datum else raw_datum
                 export_data.append({
-                    "Nieuw/Gewijzigd (14 dgn)": "🟢 JA" if is_recent else "-",
+                    "Nieuw/Gewijzigd (7 dgn)": "🟢 JA" if is_recent else "-", # <-- Aangepaste kolomnaam
                     "Datum": datum_str, 
                     "Soort Activiteit": soort, 
                     "Commissie / Ministerie": commissie,
@@ -153,11 +153,11 @@ if st.button("Start de Scan", type="primary"):
         st.subheader("📅 Binnenkort op de agenda (komende 30 dagen)")
         
         if not df_30_dagen.empty:
-            # We tonen een schone selectie van kolommen op het scherm
+            # We tonen een schone selectie van kolommen op het scherm (nu met 7 dgn)
             st.dataframe(
-                df_30_dagen[["Datum", "Nieuw/Gewijzigd (14 dgn)", "Thema's", "Titel", "Commissie / Ministerie", "Link naar Debat"]],
+                df_30_dagen[["Datum", "Nieuw/Gewijzigd (7 dgn)", "Thema's", "Titel", "Commissie / Ministerie", "Link naar Debat"]],
                 column_config={
-                    "Link naar Debat": st.column_config.LinkColumn("Bekijk online") # Maakt een aanklikbare link in de tabel
+                    "Link naar Debat": st.column_config.LinkColumn("Bekijk online")
                 },
                 use_container_width=True,
                 hide_index=True
