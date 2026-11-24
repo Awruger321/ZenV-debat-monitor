@@ -10,7 +10,6 @@ from datetime import datetime, timedelta
 # 1. JOUW THEMA'S & ZOEKWOORDEN
 # ==========================================
 THEMAS = {
-    THEMAS = {
     "Onbegrepen gedrag": [
         "onbegrepen gedrag", "verwarde personen", "verward gedrag", "onbegrepen personen",
         "LVB", "licht verstandelijke beperking", "psychische kwetsbaarheid", "psychiatrie",
