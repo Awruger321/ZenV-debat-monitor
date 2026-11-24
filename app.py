@@ -65,12 +65,7 @@ THEMAS = {
     ]
 }
 
-EXACTE_WOORDEN = [
-    "pga", "isd", "hic", "113", "lvb", "wzd", "wvggz", "e33", "wfz", "ggz"
-]
-}
-
-EXACTE_WOORDEN = ["pga", "isd", "hic", "113", "lvb", "wzd", "wvggz", "e33", "wfz"]
+EXACTE_WOORDEN = ["pga", "isd", "hic", "113", "lvb", "wzd", "wvggz", "e33", "wfz", "ggz"]
 
 def check_tekst_voor_themas(tekst):
     gevonden_themas = set()
