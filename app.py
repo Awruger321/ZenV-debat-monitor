@@ -10,15 +10,65 @@ from datetime import datetime, timedelta
 # 1. JOUW THEMA'S & ZOEKWOORDEN
 # ==========================================
 THEMAS = {
-    "Onbegrepen gedrag": ["onbegrepen gedrag", "verwarde personen", "verward gedrag", "onbegrepen personen", "LVB", "licht verstandelijke beperking", "psychische kwetsbaarheid", "crisisdienst", "WVGGZ", "WZD", "E33", "bemoeizorg", "straattriage"],
-    "Dak- en thuisloosheid": ["dakloos", "thuisloos", "maatschappelijke opvang", "beschermd wonen", "nachtopvang", "skaeve huse", "housing first"],
-    "Mensenhandel": ["mensenhandel", "loverboy", "seksuele uitbuiting", "criminele uitbuiting", "uitbuiting", "gedwongen prostitutie", "mensensmokkel", "arbeidsuitbuiting"],
-    "PGA (Persoonsgerichte Aanpak)": ["persoonsgerichte aanpak", "pga", "veelpleger", "top600", "top400", "ISD", "zorg- en veiligheidshuis", "casusregie", "procesregie", "top1000", "brusjesaanpak", "HIC"],
-    "Detentie & Terugkeer": ["detentie", "reclassering", "gevangeniswezen", "tbs", "re-integratie", "terugkeerbeleid", "na-zorg", "ex-gedetineerden", "forensische zorg", "wfz", "recidive", "bestuurlijk akkoord"],
-    "Suïcidepreventie": ["suïcide", "zelfdoding", "113", "zelfmoord", "suïcidaliteit"],
-    "Verslaving": ["verslaving", "verslavingszorg", "drugs", "crack", "middelengebruik", "drugsbeleid", "dubbele diagnose", "overlast", "gebruikersruimte"],
-    "Jeugdcriminaliteit": ["jeugdcriminaliteit", "jeugdbescherming", "jeugdreclassering", "criminele jeugdnetwerken", "ondermijning", "jonge aanwas", "preventie met gezag", "jeugdzorg"],
-    "Seksueel Geweld & Femicide": ["seksueel geweld", "zeden", "zedendelict", "femicide", "vrouwenmoord", "huiselijk geweld", "partnergeweld", "intieme terreur", "eergerelateerd geweld"]
+    THEMAS = {
+    "Onbegrepen gedrag": [
+        "onbegrepen gedrag", "verwarde personen", "verward gedrag", "onbegrepen personen",
+        "LVB", "licht verstandelijke beperking", "psychische kwetsbaarheid", "psychiatrie",
+        "veiligheidsrisico's", "gedwongen zorg", "zorgmijdend gedrag",
+        "openbare orde en veiligheid", "maatschappelijke impact", "crisisdienst",
+        "WVGGZ", "WZD", "E33", "bemoeizorg", "straattriage", "GGZ"
+    ],
+    "Dak- en thuisloosheid": [
+        "dakloos", "thuisloos", "maatschappelijke opvang", "beschermd wonen",
+        "nachtopvang", "skaeve huse", "housing first"
+    ],
+    "Mensenhandel": [
+        "mensenhandel", "loverboy", "seksuele uitbuiting", "criminele uitbuiting",
+        "uitbuiting", "gedwongen prostitutie", "mensensmokkel", "arbeidsuitbuiting",
+        "ondermijning", "criminele organisaties"
+    ],
+    "PGA (Persoonsgerichte Aanpak)": [
+        "persoonsgerichte aanpak", "pga", "veelpleger", "top600", "top400", "ISD",
+        "zorg- en veiligheidshuis", "casusregie", "procesregie", "top1000",
+        "brusjesaanpak", "HIC", "levensloopaanpak",
+        "toekomstscenario kind- en gezinsbescherming"
+    ],
+    "Detentie & Terugkeer": [
+        "detentie", "reclassering", "gevangeniswezen", "tbs", "re-integratie",
+        "terugkeerbeleid", "na-zorg", "ex-gedetineerden", "forensische zorg",
+        "wfz", "recidive", "bestuurlijk akkoord", "voorwaardelijke straf",
+        "bijzondere voorwaarden", "enkelband", "elektronische controle",
+        "voorwaardelijke invrijheidsstelling", "penitentiair programma", "ISD",
+        "inrichting stelselmatige daders", "veelplegers", "re integratieplan",
+        "recidiverisico", "risicotaxatie", "reclasseringsadvies",
+        "reclasseringstoezicht", "5 basisvoorwaarden", "adolescentenstrafrecht"
+    ],
+    "Suïcidepreventie": [
+        "suïcide", "zelfdoding", "113", "zelfmoord", "suïcidaliteit"
+    ],
+    "Verslaving": [
+        "verslaving", "verslavingszorg", "alcohol", "drugs", "crack",
+        "middelengebruik", "middelenmisbruik", "afhankelijkheid",
+        "drugscriminaliteit", "vermogensdelicten", "veelplegers",
+        "alcoholgerelateerd geweld", "drugsbeleid", "dubbele diagnose",
+        "overlast", "gebruikersruimte"
+    ],
+    "Jeugdcriminaliteit": [
+        "jeugdcriminaliteit", "jeugdbescherming", "jeugdreclassering",
+        "adolescentenstrafrecht", "criminele jeugdnetwerken", "ondermijning",
+        "jonge aanwas", "preventie met gezag", "jeugdzorg"
+    ],
+    "Seksueel Geweld & Femicide": [
+        "seksueel geweld", "zeden", "zedendelict", "risicotaxatie",
+        "maatschappelijke impact", "hands on", "hands off", "femicide",
+        "vrouwenmoord", "huiselijk geweld", "kindermishandeling",
+        "partnergeweld", "intieme terreur", "eergerelateerd geweld", "eerwraak"
+    ]
+}
+
+EXACTE_WOORDEN = [
+    "pga", "isd", "hic", "113", "lvb", "wzd", "wvggz", "e33", "wfz", "ggz"
+]
 }
 
 EXACTE_WOORDEN = ["pga", "isd", "hic", "113", "lvb", "wzd", "wvggz", "e33", "wfz"]
